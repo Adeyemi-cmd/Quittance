@@ -1,0 +1,18 @@
+[Unit]
+Description=Quittance MVP API (in-memory)
+After=network.target
+
+[Service]
+Type=simple
+WorkingDirectory=/opt/quittance/backend
+EnvironmentFile=/opt/quittance/backend/.env
+ExecStart=/usr/bin/npm run start:mvp
+Restart=always
+RestartSec=5
+User=quittance
+Group=quittance
+
+# In-memory store: process restart clears all invoices (expected for demo)
+
+[Install]
+WantedBy=multi-user.target

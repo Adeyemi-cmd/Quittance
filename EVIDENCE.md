@@ -1,6 +1,10 @@
 # Quittance — Demo & Testnet Evidence
 
-Reviewer one-pager. Fill in the blanks after Phase D4–D5 (deploy + real payments).
+Reviewer one-pager. Fill blanks after Vercel + VPS are live (Phase D4), then add a real Freighter pay (D5).
+
+Repo: https://github.com/CemAyyildiz/Quittance  
+
+Deploy handoff: [`deploy/vercel.md`](./deploy/vercel.md) · [`deploy/vps/README.md`](./deploy/vps/README.md) · [`deploy/wire-cors.md`](./deploy/wire-cors.md)
 
 ---
 
@@ -8,8 +12,8 @@ Reviewer one-pager. Fill in the blanks after Phase D4–D5 (deploy + real paymen
 
 | Item | Value |
 |------|--------|
-| Frontend | `_TBD — e.g. https://quittance.vercel.app_` |
-| API health | `_TBD — e.g. https://quittance-api.onrender.com/api/health_` |
+| Frontend | `_TBD — paste https://….vercel.app after Vercel deploy_` |
+| API health | `_TBD — paste https://api.YOURDOMAIN.com/api/health_` |
 | Network | Stellar **TESTNET** |
 
 **How to try (≤ 3 min)**
@@ -20,7 +24,17 @@ Reviewer one-pager. Fill in the blanks after Phase D4–D5 (deploy + real paymen
 4. Pay with Freighter on `/pay/[id]`  
 5. Confirm **PAID** → **Download Proof**  
 
-**Limits:** MVP API is in-memory. Process restarts clear invoices. Keep demos short.
+**Limits:** MVP API is in-memory on the VPS. Process restarts clear invoices. Keep demos short.
+
+---
+
+## GrantFox — official links (paste after URLs exist)
+
+Add at least:
+
+1. https://github.com/CemAyyildiz/Quittance  
+2. Frontend URL from the table above  
+3. API health URL from the table above (optional but useful for reviewers)
 
 ---
 
@@ -52,7 +66,8 @@ After a successful pay, copy the hash from the receipt or Freighter history.
 - **Email:** Optional delivery (`mailto:` for Send invoice / Email proof)  
 - **Verify:** `POST /api/invoices/:id/verify` loads the tx from Horizon and checks memo, amount, destination, and asset  
 - **Seller model:** Each invoice stores the creator’s `sellerPublicKey` (dynamic wallet)  
-- **Storage (demo):** In-memory MVP (`npm run start:mvp`) — not Postgres yet  
+- **Storage (demo):** In-memory MVP (`npm run start:mvp` on VPS) — not Postgres yet  
+- **Hosts:** Frontend on Vercel; API self-hosted (nginx + systemd)  
 - **Proof:** Browser PDF (“Download Proof”) + optional email  
 
 Ship plan: [`PLAN.md`](./PLAN.md).
@@ -64,5 +79,6 @@ Ship plan: [`PLAN.md`](./PLAN.md).
 - [ ] Frontend and API URLs filled above and reachable  
 - [ ] At least one real testnet tx hash linked  
 - [ ] Recording uploaded and linked  
-- [ ] CORS: `FRONTEND_URL` on API matches the live frontend origin  
+- [ ] CORS: `FRONTEND_URL` on API matches the live frontend origin ([`deploy/wire-cors.md`](./deploy/wire-cors.md))  
 - [ ] `ALLOW_SIMULATE=false` on production API  
+- [ ] GrantFox official links updated with repo + live frontend  

@@ -98,61 +98,53 @@ Set `FRONTEND_URL` on the backend to match the frontend origin (CORS).
 
 ## Deploy frontend (Vercel)
 
-1. Import the GitHub repo in [Vercel](https://vercel.com).  
+Owner deploys the frontend (dashboard or CLI). Step-by-step: **[`deploy/vercel.md`](./deploy/vercel.md)**. CORS checklist: [`deploy/wire-cors.md`](./deploy/wire-cors.md).
+
+1. Import the GitHub repo in [Vercel](https://vercel.com) (or `vercel` from `frontend/`).  
 2. Set **Root Directory** to `frontend`.  
 3. Framework preset: Next.js (see `frontend/vercel.json`).  
 4. Add environment variables (Production):
 
 | Variable | Example |
 |----------|---------|
-| `NEXT_PUBLIC_API_URL` | `https://YOUR-API-HOST/api` |
+| `NEXT_PUBLIC_API_URL` | `https://api.yourdomain.com/api` |
 | `NEXT_PUBLIC_STELLAR_NETWORK` | `TESTNET` |
 | `NEXT_PUBLIC_HORIZON_URL` | `https://horizon-testnet.stellar.org` |
 | `NEXT_PUBLIC_APP_URL` | `https://YOUR-APP.vercel.app` |
 | `NEXT_PUBLIC_USE_MOCK` | `false` |
 
-5. Deploy. After the API is live (Phase D2), point `NEXT_PUBLIC_API_URL` at it and set the backend `FRONTEND_URL` to this Vercel URL.
+5. Deploy. Set VPS `FRONTEND_URL` to this Vercel origin (exact, no trailing slash), restart the API, confirm CORS.
 
 Templates: `frontend/env.example.txt`, `frontend/env.mvp.local`.
 
 ---
 
-## Deploy backend MVP (Render)
+## Deploy backend MVP (VPS)
 
-Recommended host for `server-mvp.ts` (in-memory). Do **not** use `backend/vercel.json` for the demo — that targets the Postgres full server.
+Recommended host for `server-mvp.ts` (in-memory) is **your own VPS** (nginx + systemd). Do **not** use `backend/vercel.json` for the demo — that targets the Postgres full server.
 
-### Manual Web Service
+Full runbook (clone, `.env`, systemd, nginx/TLS, CORS wire-up): **[`deploy/vps/README.md`](./deploy/vps/README.md)**.
 
-1. Create a **Web Service** on [Render](https://render.com) from this repo.  
-2. **Root Directory:** `backend`  
-3. **Build:** `npm install`  
-4. **Start:** `npm run start:mvp`  
-5. Health check path: `/api/health`  
-6. Environment variables:
+Templates: [`deploy/vps/quittance-api.service`](./deploy/vps/quittance-api.service), [`deploy/vps/nginx-quittance-api.conf`](./deploy/vps/nginx-quittance-api.conf), [`backend/env.mvp.example`](./backend/env.mvp.example).
 
 | Variable | Value |
 |----------|--------|
 | `NODE_ENV` | `production` |
+| `PORT` | `3001` (behind nginx) |
 | `STELLAR_NETWORK` | `TESTNET` |
 | `STELLAR_HORIZON_URL` | `https://horizon-testnet.stellar.org` |
 | `FRONTEND_URL` | `https://YOUR-APP.vercel.app` (exact frontend origin) |
 | `ALLOW_SIMULATE` | `false` |
 
-`PORT` is set by Render automatically.
-
-### Blueprint (optional)
-
-`backend/render.yaml` can be used as a starting point. Set `FRONTEND_URL` in the dashboard after the frontend URL is known.
-
 ### After API is live
 
-1. Copy the public API URL (e.g. `https://quittance-api.onrender.com`).  
-2. Set frontend `NEXT_PUBLIC_API_URL` to `https://…/api` and redeploy Vercel.  
-3. Confirm CORS: browser call from the Vercel origin to `/api/health` succeeds.
+1. Public URL e.g. `https://api.yourdomain.com` must serve `GET /api/health`.  
+2. Set frontend `NEXT_PUBLIC_API_URL` to `https://api.yourdomain.com/api` and redeploy Vercel.  
+3. Confirm CORS: browser call from the Vercel origin to the API succeeds.
 
-**Note:** Free-tier / in-memory means cold starts and process restarts clear all invoices. Fine for a short demo; document this for reviewers.
+**Note:** In-memory means process restarts clear all invoices. Fine for a short demo; document this for reviewers.
 
-Env template: `backend/env.mvp.example`.
+Legacy [`backend/render.yaml`](./backend/render.yaml) is unused for this path.
 
 ---
 
@@ -175,6 +167,7 @@ Until then, run locally: `backend` → `npm run dev:mvp`, `frontend` → `npm ru
 ```
 backend/     Express API — use server-mvp.ts for demo
 frontend/    Next.js app
+deploy/      Vercel handoff + VPS systemd/nginx + CORS checklist
 db/          Postgres schema (post-demo)
 PLAN.md      Product & delivery plan
 ROADMAP.md   Short commit checklist
