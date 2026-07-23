@@ -9,7 +9,8 @@ import PaymentStatus from '@/components/PaymentStatus';
 import WalletConnect from '@/components/WalletConnect';
 import UserProfile from '@/components/UserProfile';
 import PaymentReceipt from '@/components/PaymentReceipt';
-import { formatAmount, formatDate, getTimeRemaining, getShareUrl } from '@/lib/utils';
+import { formatAmount, formatDate, getShareUrl } from '@/lib/utils';
+import { useCountdown } from '@/lib/useCountdown';
 import { ArrowLeft, Share2, Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
 
@@ -22,6 +23,7 @@ export default function InvoiceDetailPage() {
   const [paymentInfo, setPaymentInfo] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [userWallet, setUserWallet] = useState<string | null>(null);
+  const timeRemaining = useCountdown(invoice?.status === 'PENDING' ? invoice.expiresAt : null);
 
   useEffect(() => {
     loadInvoice();
@@ -184,7 +186,7 @@ export default function InvoiceDetailPage() {
                   <div className="border-b pb-4">
                     <p className="text-sm text-gray-600 mb-1">Expires In</p>
                     <p className="text-gray-900 font-semibold">
-                      {getTimeRemaining(invoice.expiresAt)}
+                      {timeRemaining}
                     </p>
                   </div>
                 )}
