@@ -5,7 +5,8 @@ import { useParams } from 'next/navigation';
 import Link from 'next/link';
 import { invoiceApi } from '@/lib/api';
 import PaymentButton from '@/components/PaymentButton';
-import QRCodeDisplay from '@/components/QRCodeDisplay';
+import PaymentQrCodes from '@/components/PaymentQrCodes';
+import { buildStellarPaymentUri } from '@/lib/stellar-payment-uri';
 import WalletConnect from '@/components/WalletConnect';
 import UserProfile from '@/components/UserProfile';
 import PaymentReceipt from '@/components/PaymentReceipt';
@@ -361,14 +362,22 @@ export default function PaymentPage() {
               <>
                 <div className="card">
                   <h3 className="text-lg font-semibold text-center mb-4">Scan QR Code</h3>
-                  <QRCodeDisplay
-                    value={paymentInfo?.stellarQrCode || paymentInfo?.paymentUrl}
-                    title=""
-                    size={220}
-                  />
-                  <p className="text-sm text-gray-600 text-center mt-4">
-                    Scan with your Stellar wallet app to pay instantly
-                  </p>
+                  {paymentInfo && (
+                    <PaymentQrCodes
+                      paymentUrl={paymentInfo.paymentUrl}
+                      stellarPaymentUri={
+                        paymentInfo.stellarPaymentUri ??
+                        buildStellarPaymentUri(
+                          invoice.sellerPublicKey,
+                          invoice.amount.toString(),
+                          invoice.assetCode,
+                          invoice.memo,
+                          invoice.assetIssuer
+                        )
+                      }
+                      size={220}
+                    />
+                  )}
                 </div>
 
                 <div className="card">
