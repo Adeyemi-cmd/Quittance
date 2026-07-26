@@ -52,5 +52,6 @@ export interface AssetLogoProps {
   size?: number;
   showName?: boolean;
   className?: string;
+  priority?: boolean;
 }
 
