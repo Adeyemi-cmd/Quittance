@@ -33,7 +33,7 @@ List any files or directories that MUST NOT be edited in this issue.
 Respect single-ownership boundaries.
 -->
 
-- Do not edit:
+- Do not edit: <!-- e.g., frontend/app/pay/[id]/page.tsx -->
 
 ## Complexity
 
