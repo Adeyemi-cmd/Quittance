@@ -92,6 +92,7 @@ export const mockInvoiceApi = {
       status: 'PENDING',
       memo: `INV-${Date.now().toString(36).toUpperCase()}-${Math.random().toString(36).substr(2, 4).toUpperCase()}`,
       sellerPublicKey: 'GABC123EXAMPLE456789',
+      assetIssuer: data.assetIssuer,
       createdAt: new Date().toISOString(),
       expiresAt: new Date(Date.now() + (data.expiresInDays || 7) * 24 * 60 * 60 * 1000).toISOString(),
     };
