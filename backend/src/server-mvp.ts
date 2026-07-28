@@ -3,7 +3,7 @@ import cors from 'cors';
 import dotenv from 'dotenv';
 import { createInvoiceSchema } from './utils/validation';
 import invoiceService from './services/invoice-memory.service';
-import { generatePaymentQR, generateStellarPaymentQR } from './utils/qrcode';
+import { generatePaymentQR, generateStellarPaymentQR, buildStellarPaymentUri } from './utils/qrcode';
 import stellarService from './services/stellar.service';
 
 // Load environment variables
@@ -63,7 +63,15 @@ app.post('/api/invoices', async (req: Request, res: Response) => {
       invoice.sellerPublicKey,
       invoice.amount.toString(),
       invoice.assetCode,
-      invoice.memo
+      invoice.memo,
+      invoice.assetIssuer
+    );
+    const stellarPaymentUri = buildStellarPaymentUri(
+      invoice.sellerPublicKey,
+      invoice.amount.toString(),
+      invoice.assetCode,
+      invoice.memo,
+      invoice.assetIssuer
     );
 
     res.status(201).json({
@@ -73,6 +81,7 @@ app.post('/api/invoices', async (req: Request, res: Response) => {
         paymentUrl,
         qrCode: qrCodeDataUrl,
         stellarQrCode,
+        stellarPaymentUri,
       },
     });
   } catch (error: any) {
@@ -169,6 +178,13 @@ app.get('/api/invoices/:id/payment-info', async (req: Request, res: Response) =>
       invoice.memo,
       invoice.assetIssuer
     );
+    const stellarPaymentUri = buildStellarPaymentUri(
+      invoice.sellerPublicKey,
+      invoice.amount.toString(),
+      invoice.assetCode,
+      invoice.memo,
+      invoice.assetIssuer
+    );
 
     res.json({
       success: true,
@@ -176,6 +192,7 @@ app.get('/api/invoices/:id/payment-info', async (req: Request, res: Response) =>
         paymentUrl,
         qrCode: qrCodeDataUrl,
         stellarQrCode,
+        stellarPaymentUri,
         invoice,
       },
     });
