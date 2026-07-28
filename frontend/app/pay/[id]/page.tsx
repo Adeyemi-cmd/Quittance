@@ -178,7 +178,7 @@ export default function PaymentPage() {
                 <div className="flex items-center justify-center gap-4">
                   <div className="relative">
                     <div className="absolute inset-0 bg-gradient-to-r from-cyan-400 to-blue-500 rounded-full blur-lg opacity-40"></div>
-                    <AssetLogo code={invoice.assetCode} size={50} showName={false} />
+                    <AssetLogo code={invoice.assetCode} size={50} showName={false} priority={true} />
                   </div>
                   <div>
                     <p className="text-5xl sm:text-6xl font-bold bg-gradient-to-r from-cyan-600 to-blue-600 bg-clip-text text-transparent">
