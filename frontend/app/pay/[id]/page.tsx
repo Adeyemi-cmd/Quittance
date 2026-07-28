@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useParams } from 'next/navigation';
 import Link from 'next/link';
 import { invoiceApi } from '@/lib/api';
@@ -24,6 +24,7 @@ export default function PaymentPage() {
   const [loading, setLoading] = useState(true);
   const [paymentInfo, setPaymentInfo] = useState<any>(null);
   const [polling, setPolling] = useState(true);
+  const verifiedRef = useRef(false);
   const [userWallet, setUserWallet] = useState<string | null>(null);
   const timeRemaining = useCountdown(invoice?.status === 'PENDING' ? invoice.expiresAt : null);
 
@@ -43,7 +44,7 @@ export default function PaymentPage() {
         if (result.data.status !== 'PENDING') {
           setInvoice(result.data);
           setPolling(false);
-          if (result.data.status === 'PAID') {
+          if (result.data.status === 'PAID' && !verifiedRef.current) {
             toast.success('Payment confirmed!');
           }
         }
@@ -71,8 +72,8 @@ export default function PaymentPage() {
   };
 
   const handlePaymentSuccess = async (txHash: string) => {
-    toast.success('Payment sent! Verifying...');
-    setPolling(true); // Restart polling
+    verifiedRef.current = true;
+    setPolling(true);
     setTimeout(async () => {
       await loadInvoice();
     }, 2000);
