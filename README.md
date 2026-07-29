@@ -176,7 +176,7 @@ Reviewer pack: **[`EVIDENCE.md`](./EVIDENCE.md)** (URLs, testnet tx hashes, reco
 | Item | Status |
 |------|--------|
 | Public frontend URL | https://quittance-eosin.vercel.app (see `EVIDENCE.md`) |
-| Public API health | TBD in `EVIDENCE.md` after VPS (D4) |
+| Public API health | See `EVIDENCE.md` (Cloudflare tunnel → VPS MVP) |
 | Testnet tx hashes | Fill in after real Freighter pays (D5; target 10+) |
 | Screen recording | Fill in after demo recording (D5) |
 | Feedback / analytics | `/feedback` + Vercel Analytics |

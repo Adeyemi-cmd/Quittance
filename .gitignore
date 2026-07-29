@@ -7,9 +7,11 @@ backend/node_modules/
 .env
 .env.*
 !.env.example
+!.env.production
 !env.mvp.example
 !frontend/env.mvp.local
 !frontend/env.example.txt
+!frontend/.env.production
 backend/.env
 frontend/.env.local
 

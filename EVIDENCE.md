@@ -13,7 +13,8 @@ Deploy handoff: [`deploy/vercel.md`](./deploy/vercel.md) · [`deploy/vps/README.
 | Item | Value |
 |------|--------|
 | Frontend | https://quittance-eosin.vercel.app |
-| API health | `_TBD — paste https://api.YOURDOMAIN.com/api/health after VPS deploy_` |
+| API health | https://insertion-followed-agencies-rejected.trycloudflare.com/api/health |
+| API (direct VPS, HTTP) | http://169.58.11.59:3001/api/health |
 | Feedback | https://quittance-eosin.vercel.app/feedback |
 | Network | Stellar **TESTNET** |
 | Analytics | Vercel Analytics (`@vercel/analytics` on the Next.js app) |
@@ -27,7 +28,7 @@ Deploy handoff: [`deploy/vercel.md`](./deploy/vercel.md) · [`deploy/vps/README.
 5. Confirm **PAID** → **Download Proof**  
 6. Optional: leave feedback at `/feedback`  
 
-**Limits:** MVP API is in-memory on the VPS. Process restarts clear invoices. Keep demos short. Until the API URL above is filled, create/pay against a local `npm run dev:mvp` backend or the configured production API.
+**Limits:** MVP API is in-memory on the VPS (`/opt/quittance`, systemd `quittance-api`). Process restarts clear invoices. HTTPS for the browser uses a Cloudflare quick tunnel (`quittance-tunnel`); if that unit restarts, the `*.trycloudflare.com` hostname changes — update `frontend/.env.production` and redeploy Vercel.
 
 ---
 
@@ -35,7 +36,7 @@ Deploy handoff: [`deploy/vercel.md`](./deploy/vercel.md) · [`deploy/vps/README.
 
 1. https://github.com/CemAyyildiz/Quittance  
 2. https://quittance-eosin.vercel.app  
-3. API health URL from the table above (add after VPS is live)
+3. https://insertion-followed-agencies-rejected.trycloudflare.com/api/health
 
 ---
 
@@ -101,7 +102,8 @@ Ship plan: [`PLAN.md`](./PLAN.md).
 ## Checklist before SCF / Level 4 submission
 
 - [x] Frontend URL filled and reachable  
-- [ ] API health URL filled and reachable  
+- [x] API health URL filled and reachable  
+
 - [ ] At least one real testnet tx hash linked (target 10+ wallet interactions)  
 - [ ] Recording uploaded and linked  
 - [ ] Contract testnet deploy address filled (or program confirms Horizon-only is accepted)  
