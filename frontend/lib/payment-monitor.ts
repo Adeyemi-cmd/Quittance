@@ -152,7 +152,7 @@ class PaymentMonitor {
       if (Notification.permission === 'granted') {
         new Notification('💰 Payment Received!', {
           body: `${amount} ${payment.assetCode} from ${payment.from.slice(0, 8)}...`,
-          icon: '/Quittance.jpg',
+          icon: '/quittance-logo.png',
           tag: payment.hash,
         });
       }
