@@ -151,4 +151,97 @@ describe('paymentSchema', () => {
       expect(result.error.issues.some((issue) => issue.path.includes('amount'))).toBe(true);
     }
   });
+
+  it('fails when amount is negative', () => {
+    const result = paymentSchema.safeParse({
+      ...validPaymentPayload,
+      amount: -50,
+    });
+
+    expect(result.success).toBe(false);
+    if (!result.success) {
+      expect(result.error.issues.some((issue) => issue.path.includes('amount'))).toBe(true);
+    }
+  });
+
+  it('fails when amount is not a number', () => {
+    const result = paymentSchema.safeParse({
+      ...validPaymentPayload,
+      amount: '100' as unknown as number,
+    });
+
+    expect(result.success).toBe(false);
+    if (!result.success) {
+      expect(result.error.issues.some((issue) => issue.path.includes('amount'))).toBe(true);
+    }
+  });
+
+  it('fails when invoiceId is empty', () => {
+    const result = paymentSchema.safeParse({
+      ...validPaymentPayload,
+      invoiceId: '',
+    });
+
+    expect(result.success).toBe(false);
+    if (!result.success) {
+      expect(result.error.issues.some((issue) => issue.path.includes('invoiceId'))).toBe(true);
+    }
+  });
+
+  it('fails when payerPublicKey is too short', () => {
+    const result = paymentSchema.safeParse({
+      ...validPaymentPayload,
+      payerPublicKey: 'G' + 'A'.repeat(54), // 55 chars
+    });
+
+    expect(result.success).toBe(false);
+    if (!result.success) {
+      expect(result.error.issues.some((issue) => issue.path.includes('payerPublicKey'))).toBe(true);
+    }
+  });
+
+  it('fails when payerPublicKey is too long', () => {
+    const result = paymentSchema.safeParse({
+      ...validPaymentPayload,
+      payerPublicKey: 'G' + 'A'.repeat(56), // 57 chars
+    });
+
+    expect(result.success).toBe(false);
+    if (!result.success) {
+      expect(result.error.issues.some((issue) => issue.path.includes('payerPublicKey'))).toBe(true);
+    }
+  });
+
+  it('fails when payerPublicKey has invalid prefix', () => {
+    const result = paymentSchema.safeParse({
+      ...validPaymentPayload,
+      payerPublicKey: 'X' + 'A'.repeat(55),
+    });
+
+    expect(result.success).toBe(false);
+    if (!result.success) {
+      expect(result.error.issues.some((issue) => issue.path.includes('payerPublicKey'))).toBe(true);
+    }
+  });
+
+  it('fails when required fields are missing', () => {
+    const result = paymentSchema.safeParse({
+      invoiceId: validInvoiceId,
+    } as unknown as Record<string, unknown>);
+
+    expect(result.success).toBe(false);
+    if (!result.success) {
+      expect(result.error.issues.some((issue) => issue.path.includes('txHash'))).toBe(true);
+      expect(result.error.issues.some((issue) => issue.path.includes('payerPublicKey'))).toBe(true);
+      expect(result.error.issues.some((issue) => issue.path.includes('amount'))).toBe(true);
+    }
+  });
+
+  it('accepts valid payload with minimal positive amount', () => {
+    const result = paymentSchema.safeParse({
+      ...validPaymentPayload,
+      amount: 0.0000001,
+    });
+    expect(result.success).toBe(true);
+  });
 });
