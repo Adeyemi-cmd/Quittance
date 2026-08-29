@@ -1,8 +1,10 @@
 import { describe, it, expect } from 'vitest';
 
-import { createInvoiceSchema, stellarPublicKeySchema } from './validation';
+import { createInvoiceSchema, paymentSchema, stellarPublicKeySchema } from './validation';
 
 const validSellerPublicKey = 'G' + 'A'.repeat(55);
+const validInvoiceId = '123e4567-e89b-12d3-a456-426614174000';
+const validTxHash = 'a'.repeat(64);
 
 describe('createInvoiceSchema', () => {
   it('valid invoice payload passes validation', () => {
@@ -61,6 +63,92 @@ describe('createInvoiceSchema', () => {
           issue.path.includes('customerEmail'),
         ),
       ).toBe(true);
+    }
+  });
+});
+
+describe('paymentSchema', () => {
+  const validPaymentPayload = {
+    invoiceId: validInvoiceId,
+    txHash: validTxHash,
+    payerPublicKey: validSellerPublicKey,
+    amount: 100,
+  };
+
+  it('valid payment payload passes validation', () => {
+    const result = paymentSchema.safeParse(validPaymentPayload);
+    expect(result.success).toBe(true);
+  });
+
+  it('fails when txHash is too short (63 chars)', () => {
+    const result = paymentSchema.safeParse({
+      ...validPaymentPayload,
+      txHash: 'a'.repeat(63),
+    });
+
+    expect(result.success).toBe(false);
+    if (!result.success) {
+      expect(result.error.issues.some((issue) => issue.path.includes('txHash'))).toBe(true);
+    }
+  });
+
+  it('fails when txHash is too long (65 chars)', () => {
+    const result = paymentSchema.safeParse({
+      ...validPaymentPayload,
+      txHash: 'a'.repeat(65),
+    });
+
+    expect(result.success).toBe(false);
+    if (!result.success) {
+      expect(result.error.issues.some((issue) => issue.path.includes('txHash'))).toBe(true);
+    }
+  });
+
+  it('fails when txHash is empty', () => {
+    const result = paymentSchema.safeParse({
+      ...validPaymentPayload,
+      txHash: '',
+    });
+
+    expect(result.success).toBe(false);
+    if (!result.success) {
+      expect(result.error.issues.some((issue) => issue.path.includes('txHash'))).toBe(true);
+    }
+  });
+
+  it('fails when invoiceId is not a valid UUID', () => {
+    const result = paymentSchema.safeParse({
+      ...validPaymentPayload,
+      invoiceId: 'not-a-uuid',
+    });
+
+    expect(result.success).toBe(false);
+    if (!result.success) {
+      expect(result.error.issues.some((issue) => issue.path.includes('invoiceId'))).toBe(true);
+    }
+  });
+
+  it('fails when payerPublicKey is invalid', () => {
+    const result = paymentSchema.safeParse({
+      ...validPaymentPayload,
+      payerPublicKey: 'not-a-valid-public-key',
+    });
+
+    expect(result.success).toBe(false);
+    if (!result.success) {
+      expect(result.error.issues.some((issue) => issue.path.includes('payerPublicKey'))).toBe(true);
+    }
+  });
+
+  it('fails when amount is zero', () => {
+    const result = paymentSchema.safeParse({
+      ...validPaymentPayload,
+      amount: 0,
+    });
+
+    expect(result.success).toBe(false);
+    if (!result.success) {
+      expect(result.error.issues.some((issue) => issue.path.includes('amount'))).toBe(true);
     }
   });
 });

@@ -1,5 +1,4 @@
-import { describe, it } from 'node:test';
-import assert from 'node:assert/strict';
+import { describe, it, expect } from 'vitest';
 
 import { createInvoiceSchema } from './validation';
 import { formatZodError, formatIfZodError } from './zod-error-format';
@@ -14,8 +13,8 @@ describe('formatZodError', () => {
       sellerPublicKey: VALID_KEY,
     });
 
-    assert.equal(result.success, true);
-    assert.equal(result.success && formatIfZodError(result.error), null);
+    expect(result.success).toBe(true);
+    expect(result.success && formatIfZodError(result.error)).toBe(null);
   });
 
   it('formats a single invalid field', () => {
@@ -24,14 +23,14 @@ describe('formatZodError', () => {
       sellerPublicKey: VALID_KEY,
     });
 
-    assert.equal(result.success, false);
+    expect(result.success).toBe(false);
     if (!result.success) {
       const formatted = formatZodError(result.error);
-      assert.equal(formatted.error, 'Validation failed');
-      assert.ok(formatted.fields.amount);
-      assert.ok(Array.isArray(formatted.fields.amount));
-      assert.ok(formatted.fields.amount.length > 0);
-      assert.equal(typeof formatted.fields.amount[0], 'string');
+      expect(formatted.error).toBe('Validation failed');
+      expect(formatted.fields.amount).toBeDefined();
+      expect(Array.isArray(formatted.fields.amount)).toBe(true);
+      expect(formatted.fields.amount.length).toBeGreaterThan(0);
+      expect(typeof formatted.fields.amount[0]).toBe('string');
     }
   });
 
@@ -42,31 +41,29 @@ describe('formatZodError', () => {
       customerEmail: 'not-an-email',
     });
 
-    assert.equal(result.success, false);
+    expect(result.success).toBe(false);
     if (!result.success) {
       const formatted = formatZodError(result.error);
-      assert.equal(formatted.error, 'Validation failed');
-      assert.ok('amount' in formatted.fields);
-      assert.ok('sellerPublicKey' in formatted.fields);
-      assert.ok('customerEmail' in formatted.fields);
-      assert.equal(Object.keys(formatted.fields).length >= 3, true);
+      expect(formatted.error).toBe('Validation failed');
+      expect('amount' in formatted.fields).toBe(true);
+      expect('sellerPublicKey' in formatted.fields).toBe(true);
+      expect('customerEmail' in formatted.fields).toBe(true);
+      expect(Object.keys(formatted.fields).length).toBeGreaterThanOrEqual(3);
     }
   });
 
   it('preserves multiple messages for a single field', () => {
-    // sellerPublicKey schema: .length(56) + regex(/^G/)
-    // A string that's short AND doesn't start with G triggers both
     const result = createInvoiceSchema.safeParse({
       amount: 1,
       sellerPublicKey: 'x',
     });
 
-    assert.equal(result.success, false);
+    expect(result.success).toBe(false);
     if (!result.success) {
       const formatted = formatZodError(result.error);
       const msgs = formatted.fields.sellerPublicKey;
-      assert.ok(Array.isArray(msgs));
-      assert.ok(msgs.length >= 2, `Expected >=2 messages, got ${msgs.length}`);
+      expect(Array.isArray(msgs)).toBe(true);
+      expect(msgs.length).toBeGreaterThanOrEqual(2);
     }
   });
 
@@ -76,18 +73,16 @@ describe('formatZodError', () => {
       sellerPublicKey: '',
     });
 
-    assert.equal(result.success, false);
+    expect(result.success).toBe(false);
     if (!result.success) {
       const formatted = formatZodError(result.error);
-
-      // Shape invariants
-      assert.equal(typeof formatted.error, 'string');
-      assert.equal(typeof formatted.fields, 'object');
+      expect(typeof formatted.error).toBe('string');
+      expect(typeof formatted.fields).toBe('object');
 
       for (const key of Object.keys(formatted.fields)) {
-        assert.ok(Array.isArray(formatted.fields[key]));
+        expect(Array.isArray(formatted.fields[key])).toBe(true);
         for (const msg of formatted.fields[key]) {
-          assert.equal(typeof msg, 'string');
+          expect(typeof msg).toBe('string');
         }
       }
     }
@@ -99,21 +94,21 @@ describe('formatZodError', () => {
       sellerPublicKey: 'bad',
     });
 
-    assert.equal(result.success, false);
+    expect(result.success).toBe(false);
     if (!result.success) {
       const originalIssues = result.error.issues.map((i) => ({ ...i }));
       formatZodError(result.error);
-      assert.deepEqual(result.error.issues, originalIssues);
+      expect(result.error.issues).toEqual(originalIssues);
     }
   });
 });
 
 describe('formatIfZodError', () => {
   it('returns null for non-ZodError input', () => {
-    assert.equal(formatIfZodError(new Error('boom')), null);
-    assert.equal(formatIfZodError(null), null);
-    assert.equal(formatIfZodError(undefined), null);
-    assert.equal(formatIfZodError('string'), null);
+    expect(formatIfZodError(new Error('boom'))).toBe(null);
+    expect(formatIfZodError(null)).toBe(null);
+    expect(formatIfZodError(undefined)).toBe(null);
+    expect(formatIfZodError('string')).toBe(null);
   });
 
   it('returns formatted error for a ZodError', () => {
@@ -122,12 +117,12 @@ describe('formatIfZodError', () => {
       sellerPublicKey: 123,
     });
 
-    assert.equal(result.success, false);
+    expect(result.success).toBe(false);
     if (!result.success) {
       const formatted = formatIfZodError(result.error);
-      assert.ok(formatted !== null);
-      assert.equal(formatted!.error, 'Validation failed');
-      assert.equal(typeof formatted!.fields, 'object');
+      expect(formatted).not.toBe(null);
+      expect(formatted!.error).toBe('Validation failed');
+      expect(typeof formatted!.fields).toBe('object');
     }
   });
 });
